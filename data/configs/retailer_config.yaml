@@ -1,0 +1,35 @@
+source:
+  instance: gcp-lab
+  database: retailer_db
+  system: retailer
+
+tables:
+  - name: products
+    load_type: full
+    watermark: null
+    is_active: true
+    target_path: landing/retailer-db/products
+
+  - name: categories
+    load_type: full
+    watermark: null
+    is_active: true
+    target_path: landing/retailer-db/categories
+
+  - name: customers
+    load_type: incremental
+    watermark: updated_at
+    is_active: true
+    target_path: landing/retailer-db/customers
+
+  - name: orders
+    load_type: incremental
+    watermark: updated_at
+    is_active: true
+    target_path: landing/retailer-db/orders
+
+  - name: order_items
+    load_type: incremental
+    watermark: updated_at
+    is_active: true
+    target_path: landing/retailer-db/order_items

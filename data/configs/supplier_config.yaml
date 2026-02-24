@@ -1,0 +1,15 @@
+database: supplier-db
+datasource: mysql-db
+
+tables:
+  - name: suppliers
+    load_type: full
+    watermark: null
+    is_active: true
+    target_path: supplier
+
+  - name: product_suppliers
+    load_type: incremental
+    watermark: last_updated
+    is_active: true
+    target_path: supplier

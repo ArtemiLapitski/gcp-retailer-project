@@ -1,6 +1,8 @@
+CREATE SCHEMA supplier;
+
 -- Suppliers Table
-CREATE TABLE suppliers (
-    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE supplier.suppliers (
+    supplier_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     supplier_name VARCHAR(255) NOT NULL,
     contact_name VARCHAR(255),
     phone VARCHAR(20),
@@ -12,13 +14,28 @@ CREATE TABLE suppliers (
 );
 
 -- Product Suppliers Table (Mapping suppliers to products)
-CREATE TABLE product_suppliers (
+CREATE TABLE supplier.product_suppliers (
     supplier_id INT,
     product_id INT,
     supply_price DECIMAL(10,2),
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (supplier_id, product_id)
 );
+
+CREATE OR REPLACE FUNCTION update_last_updated_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.last_updated = NOW();
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER update_supplier_timestamp
+BEFORE UPDATE ON supplier.product_suppliers
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
 
 -- Insert 100 supplier records
 INSERT INTO suppliers (supplier_name, contact_name, phone, email, address, city, country) VALUES

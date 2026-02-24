@@ -1,44 +1,88 @@
-CREATE TABLE products (
+CREATE SCHEMA retailer;
+
+CREATE TABLE retailer.products (
     product_id INT PRIMARY KEY,
     name VARCHAR(255),
     category_id INT,
     price DECIMAL(10,2),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE categories (
+CREATE TABLE retailer.categories (
     category_id INT PRIMARY KEY,
     name VARCHAR(255),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE customers (
+CREATE TABLE retailer.customers (
     customer_id INT PRIMARY KEY,
     name VARCHAR(255),
     email VARCHAR(255),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE orders (
+CREATE TABLE retailer.orders (
     order_id INT PRIMARY KEY,
     customer_id INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10,2),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE order_items (
+CREATE TABLE retailer.order_items (
     order_item_id INT PRIMARY KEY,
     order_id INT,
     product_id INT,
     quantity INT,
     price DECIMAL(10,2),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
+-- 1) Reusable function (put it in public so it can be reused everywhere)
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2) Triggers (one per table)
+
+DROP TRIGGER IF EXISTS trg_products_updated_at ON retailer.products;
+CREATE TRIGGER trg_products_updated_at
+BEFORE UPDATE ON retailer.products
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS trg_categories_updated_at ON retailer.categories;
+CREATE TRIGGER trg_categories_updated_at
+BEFORE UPDATE ON retailer.categories
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS trg_customers_updated_at ON retailer.customers;
+CREATE TRIGGER trg_customers_updated_at
+BEFORE UPDATE ON retailer.customers
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS trg_orders_updated_at ON retailer.orders;
+CREATE TRIGGER trg_orders_updated_at
+BEFORE UPDATE ON retailer.orders
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+DROP TRIGGER IF EXISTS trg_order_items_updated_at ON retailer.order_items;
+CREATE TRIGGER trg_order_items_updated_at
+BEFORE UPDATE ON retailer.order_items
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+
 -- Insert into categories\
-INSERT INTO categories (category_id, name) VALUES
+INSERT INTO retailer.categories (category_id, name) VALUES
     (1, 'Electronics'),
     (2, 'Clothing'),
     (3, 'Home Appliances'),
@@ -51,7 +95,7 @@ INSERT INTO categories (category_id, name) VALUES
     (10, 'Grocery');
 
 -- Insert into products
-INSERT INTO products (product_id, name, category_id, price) VALUES
+INSERT INTO retailer.products (product_id, name, category_id, price) VALUES
     (101, 'Laptop', 1, 1000.00),
     (102, 'T-Shirt', 2, 20.00),
     (103, 'Refrigerator', 3, 500.00),
@@ -74,7 +118,7 @@ INSERT INTO products (product_id, name, category_id, price) VALUES
     (120, 'Coffee Beans', 10, 20.00);
 
 -- Insert into customers
-INSERT INTO customers (customer_id, name, email) VALUES
+INSERT INTO retailer.customers (customer_id, name, email) VALUES
     (1, 'John Doe', 'john@example.com'),
     (2, 'Jane Smith', 'jane@example.com'),
     (3, 'Michael Johnson', 'michael@example.com'),
@@ -87,7 +131,7 @@ INSERT INTO customers (customer_id, name, email) VALUES
     (10, 'Emma Hernandez', 'emma@example.com');
 
 -- Insert into orders
-INSERT INTO orders (order_id, customer_id, total_amount) VALUES
+INSERT INTO retailer.orders (order_id, customer_id, total_amount) VALUES
     (1001, 1, 1020.00),
     (1002, 2, 20.00),
     (1003, 3, 150.00),
@@ -100,7 +144,7 @@ INSERT INTO orders (order_id, customer_id, total_amount) VALUES
     (1010, 10, 90.00);
 
 -- Insert into order_items
-INSERT INTO order_items (order_item_id, order_id, product_id, quantity, price) VALUES
+INSERT INTO retailer.order_items (order_item_id, order_id, product_id, quantity, price) VALUES
     (1, 1001, 101, 1, 1000.00),
     (2, 1001, 102, 1, 20.00),
     (3, 1002, 102, 1, 20.00),
