@@ -1,0 +1,35 @@
+{
+  "source_name": "supplier",
+  "gcs": {
+    "bucket": "retailer-project",
+    "landing_base": "landing/supplier-db",
+    "archive_base": "landing/supplier-db/archive"
+  },
+  "postgres": {
+    "postgres_url": "jdbc:postgresql://34.118.8.188:5432/supplier-db",
+    "postgres_schema": "supplier",
+    "postgres_user": "myuser",
+    "postgres_driver": "org.postgresql.Driver"
+  },
+  "bigquery": {
+    "project": "project-e6877a1b-1921-4a15-95c",
+    "audit_table": "meta.audit_logs",
+    "log_table": "meta.pipeline_logs"
+  },
+  "tables": [
+    {
+      "name": "suppliers",
+      "load_type": "full",
+      "watermark": null,
+      "is_active": true,
+      "target_path": "supplier"
+    },
+    {
+      "name": "product_suppliers",
+      "load_type": "incremental",
+      "watermark": "last_updated",
+      "is_active": true,
+      "target_path": "supplier"
+    }
+  ]
+}

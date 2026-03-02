@@ -1,6 +1,9 @@
 current:
-finish get_written_stats
-create git repo
+finish gcp creds to spark. do the testing
+
+export PYSPARK_PYTHON=/Users/artemi_lapitski/Desktop/gcp-project/gcp-retailer-project/venv/bin/python3
+export PYSPARK_DRIVER_PYTHON=/Users/artemi_lapitski/Desktop/gcp-project/gcp-retailer-project/venv/bin/python3
+spark-submit --master 'local[*]' notebooks/postgres-to-landing.py --config gs://retailer-project/configs/retailer_config.json
 
 when it comes to incrememntal load - for now you take > strictly greater than latest
 watermark, but this could be bad if new data added to source for same watermark.

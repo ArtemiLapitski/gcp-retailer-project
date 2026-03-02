@@ -1,7 +1,19 @@
-source:
-  instance: gcp-lab
-  database: retailer_db
-  system: retailer
+source_name: retailer
+
+gcs:
+  bucket: retailer-project
+  landing_base: landing/retailer-db
+
+postgres:
+  url: jdbc:postgresql://34.118.8.188:5432/retailer-db
+  schema: retailer
+  user: myuser
+  driver: org.postgresql.Driver
+
+bigquery:
+  project: project-e6877a1b-1921-4a15-95c
+  audit_table: meta.audit_logs
+  log_table: meta.pipeline_logs
 
 tables:
   - name: products

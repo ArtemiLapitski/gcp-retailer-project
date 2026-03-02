@@ -1,0 +1,56 @@
+{
+  "source_name": "retailer",
+  "gcs": {
+    "bucket": "retailer-project",
+    "landing_base": "landing/retailer-db",
+    "archive_base": "landing/retailer-db/archive"
+  },
+  "postgres": {
+    "postgres_url": "jdbc:postgresql://34.118.8.188:5432/retailer-db",
+    "postgres_schema": "retailer",
+    "postgres_user": "myuser",
+    "postgres_driver": "org.postgresql.Driver"
+  },
+  "bigquery": {
+    "project": "project-e6877a1b-1921-4a15-95c",
+    "audit_table": "meta.audit_logs",
+    "log_table": "meta.pipeline_logs"
+  },
+  "tables": [
+    {
+      "name": "products",
+      "load_type": "full",
+      "watermark": null,
+      "is_active": true,
+      "target_path": "landing/retailer-db/products"
+    },
+    {
+      "name": "categories",
+      "load_type": "full",
+      "watermark": null,
+      "is_active": true,
+      "target_path": "landing/retailer-db/categories"
+    },
+    {
+      "name": "customers",
+      "load_type": "incremental",
+      "watermark": "updated_at",
+      "is_active": true,
+      "target_path": "landing/retailer-db/customers"
+    },
+    {
+      "name": "orders",
+      "load_type": "incremental",
+      "watermark": "updated_at",
+      "is_active": true,
+      "target_path": "landing/retailer-db/orders"
+    },
+    {
+      "name": "order_items",
+      "load_type": "incremental",
+      "watermark": "updated_at",
+      "is_active": true,
+      "target_path": "landing/retailer-db/order_items"
+    }
+  ]
+}

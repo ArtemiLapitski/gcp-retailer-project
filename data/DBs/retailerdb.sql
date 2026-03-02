@@ -1,41 +1,46 @@
 CREATE SCHEMA retailer;
 
+DROP TABLE IF EXISTS retailer.products;
 CREATE TABLE retailer.products (
     product_id INT PRIMARY KEY,
     name VARCHAR(255),
     category_id INT,
     price DECIMAL(10,2),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS retailer.categories;
 CREATE TABLE retailer.categories (
     category_id INT PRIMARY KEY,
     name VARCHAR(255),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS retailer.customers;
 CREATE TABLE retailer.customers (
     customer_id INT PRIMARY KEY,
     name VARCHAR(255),
     email VARCHAR(255),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS retailer.orders;
 CREATE TABLE retailer.orders (
     order_id INT PRIMARY KEY,
     customer_id INT,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    order_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10,2),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS retailer.order_items;
 CREATE TABLE retailer.order_items (
     order_item_id INT PRIMARY KEY,
     order_id INT,
     product_id INT,
     quantity INT,
     price DECIMAL(10,2),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 

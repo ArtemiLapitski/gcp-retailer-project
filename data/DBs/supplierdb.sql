@@ -10,17 +10,35 @@ CREATE TABLE supplier.suppliers (
     address TEXT,
     city VARCHAR(100),
     country VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE OR REPLACE FUNCTION update_created_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.created_at = NOW();
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+DROP TRIGGER IF EXISTS update_suppliers_timestamp ON supplier.suppliers;
+CREATE TRIGGER update_supplier_timestamp
+BEFORE UPDATE ON supplier.suppliers
+FOR EACH ROW
+EXECUTE FUNCTION update_created_at_column();
+
 
 -- Product Suppliers Table (Mapping suppliers to products)
 CREATE TABLE supplier.product_suppliers (
     supplier_id INT,
     product_id INT,
     supply_price DECIMAL(10,2),
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (supplier_id, product_id)
 );
+
 
 CREATE OR REPLACE FUNCTION update_last_updated_column()
 RETURNS TRIGGER AS $$
@@ -31,14 +49,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE TRIGGER update_supplier_timestamp
+DROP TRIGGER IF EXISTS update_product_suppliers_timestamp ON supplier.product_suppliers;
+CREATE TRIGGER update_product_suppliers_timestamp
 BEFORE UPDATE ON supplier.product_suppliers
 FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 
+
 -- Insert 100 supplier records
-INSERT INTO suppliers (supplier_name, contact_name, phone, email, address, city, country) VALUES
+INSERT INTO supplier.suppliers (supplier_name, contact_name, phone, email, address, city, country) VALUES
 ('ABC Suppliers', 'John Doe', '+1-555-1234', 'john@abc.com', '123 Main St', 'New York', 'USA'),
 ('Global Distributors', 'Alice Smith', '+44-203-4567', 'alice@global.com', '456 High St', 'London', 'UK'),
 ('Asian Traders', 'Raj Kumar', '+91-9876543210', 'raj@asian.com', '789 MG Road', 'Mumbai', 'India'),
@@ -48,6 +68,6 @@ INSERT INTO suppliers (supplier_name, contact_name, phone, email, address, city,
 ('Pacific Imports', 'Lily Chen', '+86-21-98765432', 'lily@pacificimports.com', '456 Nanjing Road', 'Shanghai', 'China');
 
 -- Insert 100 product supplier mapping records
-INSERT INTO product_suppliers (supplier_id, product_id, supply_price) VALUES
+INSERT INTO supplier.product_suppliers (supplier_id, product_id, supply_price) VALUES
 (1, 101, 12.50), (1, 102, 15.00), (2, 103, 10.75), (3, 101, 11.25), (3, 104, 9.90),
 (4, 105, 14.30), (5, 106, 13.20), (6, 107, 16.40), (7, 108, 18.75), (8, 109, 12.85);
